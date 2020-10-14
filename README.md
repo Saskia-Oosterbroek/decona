@@ -1,6 +1,6 @@
 # Decona
 
-####  *De*multiplex to polished *co*nsensus sequenses for *Na*nopore
+####  **De**multiplex to polished **co**nsensus sequenses for **Na**nopore
 Decona can process multiple samples in one line of code:
 - Mixed samples cointaing multiple species from bulk and eDNA
 - Mixed amplicons in one barcode
@@ -9,8 +9,7 @@ Decona can process multiple samples in one line of code:
 - Outputs Medaka polished consensus sequences
 
 ### Installation
-
-All dependencies are included with execption of the BLAST+ commandline application. If the BLAST function is desired it can be downloaded from  [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/).
+Decona is sensetive to installation version of dependencies. To keep things simple the installer will create a virtual Conda environment for you containing everything you need. All dependencies are included with execption of the BLAST+ commandline application. If the BLAST function is desired it can be downloaded from  [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/).
 
 ```sh
 $ tar xjvf decona-0.1-0.tar.bz2
@@ -22,16 +21,16 @@ $ conda activate decona
 
 Decona runs on all your favorite sequence processing tools:
 
-| Tool | function |
-| ------ | ------ |
-| Nanofilt | Filter raw reads on quality and readlength |
-| Qcat | Demultiplex samples |
-| CD-hit | Cluster reads from samples containing multiple species |
-| Minimap2 | Align (clustered) reads |
-| Racon | Make first consensus sequences |
-| Medaka | Polish consensus sequences |
-| Medaka | SNP calling (to be verified for mixed samples) |
-| BLAST+ | Optional, needs additional install [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/) |
+| Tool | version |  function |
+| ------ | ------ | ------ |
+| Nanofilt | 2.3.0 | Filter raw reads on quality and readlength |
+| Qcat | 1.1.0 | Demultiplex samples |
+| CD-hit | 4.8.1 | Cluster reads from samples containing multiple species / amplicons |
+| Minimap2 | 2.17 | Align (clustered) reads |
+| Racon | 1.4.13 | Make first consensus sequences |
+| Medaka | 1.1.2 | Polish consensus sequences |
+| Medaka | 1.1.2 | SNP calling (to be verified for mixed samples) |
+| BLAST+ | 2.10.1 | Optional, needs additional install [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/) |
 
 
 ### Usage
@@ -50,10 +49,7 @@ Will: Demultiplex, filter for readlength 800-1200 bp and quality score 10, clust
 | -l | minimum length (default 300) |
 | -m | maximum length |
 | -c | clustering percentage, 0.8 = 80% identity (default 0.8) |
-| -w | clustering wordlength (default 5 )
--n 7      for thresholds 0.88 ~ 0.9
--n 6      for thresholds 0.85 ~ 0.88
--n 5      for thresholds 0.80 ~ 0.85|
+| -w | clustering wordlength (default 5 )   [ -n 7 for thresholds 0.88 ~ 0.9 / -n 6 for thresholds 0.85 ~ 0.88 / -n 5 for thresholds 0.80 ~ 0.85 ] |
 | -n | cluster size: minimum amount of reads in a cluster to continue to consensusing step (default 100) |
 | -M | polish consensus with Medaka |
 | -v | variant calling with Medaka |
@@ -62,4 +58,3 @@ Will: Demultiplex, filter for readlength 800-1200 bp and quality score 10, clust
 | -i | gives an overview of the percentage of sequences assigned to the clusters |
 | -r | re-cluster consensus sequences. It may happen that multiple clusters will arise containing one species. Reclustering will cluster the original fasta's based on the polished result at 99%. This may be especially important if you would like to do variant calling. |
 | -f | folder structure: your fastq files are already demultiplexed and stored in barcode folders such as data already demultiplexed by MinION Mk1C. |
-
