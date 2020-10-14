@@ -34,6 +34,7 @@ Decona runs on all your favourite sequence processing tools:
 
 
 ### Usage
+**Decona works on all fastq files in your working directory.** It is a good idea to have an empty directory with just the files you want to run. A results folder will appear in your working directory after a successful run.
 Example 
 ```sh 
 $ decona -d -l 800 -m 1200 -q 10 -c 0.80 -n 100 -M 
