@@ -1,6 +1,6 @@
 # Decona
 
-####  Demultiplex to polished consensus sequences for Nanopore
+####  From demultiplexing to consensus for Nanopore amplicon data  
 Decona can process multiple samples in one line of code:
 - Mixed samples containing multiple species from bulk and eDNA
 - Mixed amplicons in one barcode
