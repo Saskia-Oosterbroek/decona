@@ -1,8 +1,9 @@
-# MinEASY
+# Decona
 
-####  From fastq to polished consensus sequenses in one go
-MinEASY can process multiple samples in one line of code:
+####  *De*multiplex to polished *co*nsensus sequenses for *Na*nopore
+Decona can process multiple samples in one line of code:
 - Mixed samples cointaing multiple species from bulk and eDNA
+- Mixed amplicons in one barcode
 - Multiplexed barcodes
 - Multiple samples in one run
 - Outputs Medaka polished consensus sequences
@@ -12,13 +13,14 @@ MinEASY can process multiple samples in one line of code:
 All dependencies are included with execption of the BLAST+ commandline application. If the BLAST function is desired it can be downloaded from  [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/).
 
 ```sh
-$ conda install mineasy
-$ conda activate mineasy
+$ tar xjvf decona-0.1-0.tar.bz2
+$ ./decona/bin/install.sh
+$ conda activate decona
 ```
 
 ### Dependencies
 
-MinEASY runs on all your favorite sequence processing tools:
+Decona runs on all your favorite sequence processing tools:
 
 | Tool | function |
 | ------ | ------ |
@@ -41,19 +43,23 @@ Will: Demultiplex, filter for readlength 800-1200 bp and quality score 10, clust
 | Command | Function | 
 | ------ | ------ |
 | -h | help | 
-| -d |  demultiplex |
-| -q | quality score |
-| -l | minimum length |
+| -v | version | 
+| -p | plot readlength distribution histogram. Not sure what your average readlength is? Try this: $ decona -p |
+| -d | demultiplex samples |
+| -q | quality score (default 10) |
+| -l | minimum length (default 300) |
 | -m | maximum length |
-| -c | clustering percentage, 0.8 = 80% identity |
-| -w | clustering wordlength |
-| -n | clustersize default 100 |
+| -c | clustering percentage, 0.8 = 80% identity (default 0.8) |
+| -w | clustering wordlength (default 5 )
+-n 7      for thresholds 0.88 ~ 0.9
+-n 6      for thresholds 0.85 ~ 0.88
+-n 5      for thresholds 0.80 ~ 0.85|
+| -n | cluster size: minimum amount of reads in a cluster to continue to consensusing step (default 100) |
 | -M | polish consensus with Medaka |
 | -v | variant calling with Medaka |
-| -B | yourblastdatabase.fasta |
-| -b | /path/to/existing/blast/database | 
-| -i | gives info about % sequences assigned to clusters |
-| -p | plot readlength distribution histogram |
-| -r | re-cluster consensus sequences |
-| -f | folder structure: your fastq files are already demultiplexed and stored in barcode folders |
+| -B | yourblastdatabase.fasta, fasta file can be used as blast database. ([NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/) tool needs to be installed! |
+| -b | /path/to/existing/blast/database Use this option if you already have a BLAST+ database on your system | 
+| -i | gives an overview of the percentage of sequences assigned to the clusters |
+| -r | re-cluster consensus sequences. It may happen that multiple clusters will arise containing one species. Reclustering will cluster the original fasta's based on the polished result at 99%. This may be especially important if you would like to do variant calling. |
+| -f | folder structure: your fastq files are already demultiplexed and stored in barcode folders such as data already demultiplexed by MinION Mk1C. |
 
