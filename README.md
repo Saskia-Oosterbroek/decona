@@ -1,6 +1,7 @@
 # Decona
+Version 0.1.1 Major bug-fix
 
-####  From demultiplexing to consensus for Nanopore amplicon data  
+##  From demultiplexing to consensus for Nanopore amplicon data  
 Decona can process multiple samples in one line of code:
 - Mixed samples containing multiple species from bulk and eDNA
 - Mixed amplicons in one barcode
@@ -8,7 +9,10 @@ Decona can process multiple samples in one line of code:
 - Multiple samples in one run
 - Outputs Medaka polished consensus sequences
 
-### Installation
+<img src="https://raw.githubusercontent.com/Saskia-Oosterbroek/decona/master/Decona_overview.JPG" width="600" />
+
+
+## Installation
 Decona is sensitive to installation version of dependencies. To keep things simple the installer will create a virtual Conda environment for you containing everything you need. All dependencies are included with exception of the BLAST+ command line application. If the BLAST function is desired it can be downloaded from  [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/).
 
 ```sh
@@ -17,7 +21,8 @@ $ ./decona/bin/install.sh
 $ conda activate decona
 ```
 
-### Dependencies
+
+## Dependencies
 
 Decona runs on all your favourite sequence processing tools:
 
@@ -28,12 +33,13 @@ Decona runs on all your favourite sequence processing tools:
 | CD-hit | 4.8.1 | Cluster reads from samples containing multiple species / amplicons |
 | Minimap2 | 2.17 | Align (clustered) reads |
 | Racon | 1.4.13 | Make first consensus sequences |
-| Medaka | 1.1.2 | Polish consensus sequences |
-| Medaka | 1.1.2 | SNP calling (to be verified for mixed samples) |
+| Medaka | 1.0.3 | Polish consensus sequences |
+| Medaka | 1.0.3 | SNP calling (to be verified for mixed samples) |
 | BLAST+ | 2.10.1 | Optional, needs additional install [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/) |
 
 
-### Usage
+
+## Usage
 **Decona works on all fastq files in your working directory.** It is a good idea to have an empty directory with just the files you want to run. A results folder will appear in your working directory after a successful run.
 Example 
 ```sh 
