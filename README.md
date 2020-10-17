@@ -16,7 +16,7 @@ Decona can process multiple samples in one line of code:
 Decona is sensitive to installation version of dependencies. To keep things simple the installer will create a virtual Conda environment for you containing everything you need. All dependencies are included with exception of the BLAST+ command line application. If the BLAST function is desired it can be downloaded from  [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/).
 
 ```sh
-$ tar xjvf decona-0.1-0.tar.bz2
+$ tar xjvf decona-0.1-1.tar.bz2
 $ ./decona/bin/install.sh
 $ conda activate decona
 ```
