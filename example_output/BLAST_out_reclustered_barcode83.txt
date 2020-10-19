@@ -1,0 +1,122 @@
+# BLASTN 2.6.0+
+# Query: consensus_medaka-29-9.fasta
+# Database: /mnt/c/Users/ooste189/Downloads/WORKdir/test2/test/BLASTdatabase/All_references_Burgers_20200707.fasta
+# Fields: query id, % identity, alignment length, mismatches, gap opens, evalue, bit score, subject titles, subject ids
+# 15 hits found
+consensus_medaka-29-9.fasta	98.263	2015	24	9	0.0	3517	Caesio cuning voucher 94 mitochondrion, complete genome	gb|KP874185|
+consensus_medaka-29-9.fasta	94.593	2016	91	15	0.0	3103	Pterocaesio tile mitochondrion, complete genome	ref|NC_004408|
+consensus_medaka-29-9.fasta	93.254	2016	113	18	0.0	2948	Lutjanus erythropterus mitochondrion, complete genome	gb|KP939271|
+consensus_medaka-29-9.fasta	91.143	2021	151	21	0.0	2715	Lutjanus sebae mitochondrion, complete genome	NC_012737_extraction
+consensus_medaka-29-9.fasta	91.143	2021	151	21	0.0	2715	Lutjanus sebae mitochondrion, complete genome	gb|FJ824742|
+consensus_medaka-29-9.fasta	89.164	2021	190	23	0.0	2492	Monodactylus argenteus mitochondrial DNA, complete genome	dbj|AP009169|
+consensus_medaka-29-9.fasta	88.966	2021	187	31	0.0	2464	Siniperca scherzeri mitochondrial DNA, complete genome	dbj|AP014527|
+consensus_medaka-29-9.fasta	88.916	2021	189	29	0.0	2459	Coreoperca loona mitochondrion, complete genome	gb|KJ644781|
+consensus_medaka-29-9.fasta	88.564	2020	200	25	0.0	2422	Siganus guttatus mitochondrion, complete genome	gb|KJ420577|
+consensus_medaka-29-9.fasta	88.323	2021	205	26	0.0	2396	Siganus vulpinus mitochondrion, complete genome	ref|NC_025588|
+consensus_medaka-29-9.fasta	88.180	2022	208	21	0.0	2381	Siganus puellus mitochondrion, complete genome	gb|KF709954|
+consensus_medaka-29-9.fasta	87.370	2027	215	33	0.0	2287	Plectorhinchus lineatus isolate SCAUA 120 mitochondrion, complete genome	ref|NC_025517|
+consensus_medaka-29-9.fasta	87.333	2021	217	34	0.0	2278	Paracanthurus hepatus mitochondrion, complete genome	ref|NC_029237|
+consensus_medaka-29-9.fasta	87.148	2023	217	36	0.0	2255	Acanthurus leucosternon mitochondrion, complete genome	gb|EU136032|
+consensus_medaka-29-9.fasta	87.098	2023	221	34	0.0	2254	Ctenochaetus striatus mitochondrion, complete genome	gb|KU244260|
+# BLASTN 2.6.0+
+# Query: consensus_medaka-38-17.fasta
+# Database: /mnt/c/Users/ooste189/Downloads/WORKdir/test2/test/BLASTdatabase/All_references_Burgers_20200707.fasta
+# Fields: query id, % identity, alignment length, mismatches, gap opens, evalue, bit score, subject titles, subject ids
+# 15 hits found
+consensus_medaka-38-17.fasta	99.895	1906	0	2	0.0	3507	Pomacanthus imperator mitochondrion, complete genome	gb|KP218259|
+consensus_medaka-38-17.fasta	92.614	1909	132	9	0.0	2736	Pomacanthus xanthometopon mitochondrion, complete genome	gb|KP218258|
+consensus_medaka-38-17.fasta	88.060	1918	195	29	0.0	2242	Genicanthus lamarck mitochondrion, complete genome	gb|KT001111|
+consensus_medaka-38-17.fasta	87.683	1916	207	27	0.0	2204	Centropyge eibli mitochondrion, complete genome	gb|KT001113|
+consensus_medaka-38-17.fasta	87.909	1894	200	24	0.0	2202	Pygoplites diacanthus voucher 276 mitochondrion, complete genome	gb|KP898265|
+consensus_medaka-38-17.fasta	87.850	1893	202	24	0.0	2196	Pygoplites diacanthus mitochondrion, complete genome	gb|KP033453|
+consensus_medaka-38-17.fasta	87.474	1916	209	25	0.0	2180	Genicanthus melanospilos mitochondrion, complete genome	gb|KR870991|
+consensus_medaka-38-17.fasta	87.467	1915	210	25	0.0	2180	Genicanthus bellus mitochondrion, complete genome	gb|KP965877|
+consensus_medaka-38-17.fasta	85.796	1922	225	43	0.0	1993	Monodactylus argenteus mitochondrial DNA, complete genome	dbj|AP009169|
+consensus_medaka-38-17.fasta	85.843	1886	227	32	0.0	1967	Coreoperca loona mitochondrion, complete genome	gb|KJ644781|
+consensus_medaka-38-17.fasta	85.714	1897	225	35	0.0	1960	Siniperca scherzeri mitochondrial DNA, complete genome	dbj|AP014527|
+consensus_medaka-38-17.fasta	85.146	1885	234	34	0.0	1888	UNVERIFIED: Zebrasoma desjardinii mitochondrion sequence	gb|KU244264|
+consensus_medaka-38-17.fasta	84.889	1886	235	36	0.0	1858	Paracanthurus hepatus mitochondrion, complete genome	ref|NC_029237|
+consensus_medaka-38-17.fasta	84.762	1890	242	34	0.0	1853	Lutjanus erythropterus mitochondrion, complete genome	gb|KP939271|
+consensus_medaka-38-17.fasta	84.518	1899	248	35	0.0	1836	Siganus puellus mitochondrion, complete genome	gb|KF709954|
+# BLASTN 2.6.0+
+# Query: consensus_medaka-42-15.fasta
+# Database: /mnt/c/Users/ooste189/Downloads/WORKdir/test2/test/BLASTdatabase/All_references_Burgers_20200707.fasta
+# Fields: query id, % identity, alignment length, mismatches, gap opens, evalue, bit score, subject titles, subject ids
+# 15 hits found
+consensus_medaka-42-15.fasta	95.518	2008	78	7	0.0	3199	Naso lopezi mitochondrial DNA, complete genome	dbj|AP009163|
+consensus_medaka-42-15.fasta	88.525	2013	203	24	0.0	2412	Siniperca scherzeri mitochondrial DNA, complete genome	dbj|AP014527|
+consensus_medaka-42-15.fasta	88.492	2016	199	26	0.0	2407	Coreoperca loona mitochondrion, complete genome	gb|KJ644781|
+consensus_medaka-42-15.fasta	88.145	2016	212	22	0.0	2374	Monodactylus argenteus mitochondrial DNA, complete genome	dbj|AP009169|
+consensus_medaka-42-15.fasta	88.002	2017	209	25	0.0	2353	Lutjanus erythropterus mitochondrion, complete genome	gb|KP939271|
+consensus_medaka-42-15.fasta	87.798	2016	225	20	0.0	2340	Caesio cuning voucher 94 mitochondrion, complete genome	gb|KP874185|
+consensus_medaka-42-15.fasta	87.828	2021	210	32	0.0	2337	Pterocaesio tile mitochondrion, complete genome	ref|NC_004408|
+consensus_medaka-42-15.fasta	87.438	2014	222	26	0.0	2289	UNVERIFIED: Acanthurus nigrofuscus mitochondrion sequence	gb|KU244258|
+consensus_medaka-42-15.fasta	87.425	1996	220	24	0.0	2266	Paracanthurus hepatus mitochondrion, complete genome	ref|NC_029237|
+consensus_medaka-42-15.fasta	86.998	2015	230	29	0.0	2241	Ctenochaetus striatus mitochondrion, complete genome	gb|KU244260|
+consensus_medaka-42-15.fasta	86.978	2012	233	22	0.0	2237	Acanthurus leucosternon mitochondrion, complete genome	gb|EU136032|
+consensus_medaka-42-15.fasta	87.192	1991	216	32	0.0	2228	Siganus guttatus mitochondrion, complete genome	gb|KJ420577|
+consensus_medaka-42-15.fasta	86.825	2019	234	25	0.0	2226	Lutjanus sebae mitochondrion, complete genome	NC_012737_extraction
+consensus_medaka-42-15.fasta	86.825	2019	234	25	0.0	2226	Lutjanus sebae mitochondrion, complete genome	gb|FJ824742|
+consensus_medaka-42-15.fasta	87.085	1990	222	30	0.0	2218	Siganus vulpinus mitochondrion, complete genome	ref|NC_025588|
+# BLASTN 2.6.0+
+# Query: consensus_medaka-45-24.fasta
+# Database: /mnt/c/Users/ooste189/Downloads/WORKdir/test2/test/BLASTdatabase/All_references_Burgers_20200707.fasta
+# Fields: query id, % identity, alignment length, mismatches, gap opens, evalue, bit score, subject titles, subject ids
+# 15 hits found
+consensus_medaka-45-24.fasta	99.898	1959	2	0	0.0	3607	Platax orbicularis mitochondrion, complete genome	NC_013136_extraction
+consensus_medaka-45-24.fasta	99.898	1959	2	0	0.0	3607	Platax orbicularis mitochondrial DNA, complete genome	dbj|AP006825|
+consensus_medaka-45-24.fasta	88.093	1982	188	40	0.0	2309	Coreoperca loona mitochondrion, complete genome	gb|KJ644781|
+consensus_medaka-45-24.fasta	87.816	1978	200	35	0.0	2279	Siniperca scherzeri mitochondrial DNA, complete genome	dbj|AP014527|
+consensus_medaka-45-24.fasta	87.051	1977	216	33	0.0	2196	Monodactylus argenteus mitochondrial DNA, complete genome	dbj|AP009169|
+consensus_medaka-45-24.fasta	86.845	1984	211	45	0.0	2172	Lutjanus erythropterus mitochondrion, complete genome	gb|KP939271|
+consensus_medaka-45-24.fasta	86.751	1985	208	51	0.0	2158	Pterocaesio tile mitochondrion, complete genome	ref|NC_004408|
+consensus_medaka-45-24.fasta	86.684	1975	219	40	0.0	2150	UNVERIFIED: Zebrasoma desjardinii mitochondrion sequence	gb|KU244264|
+consensus_medaka-45-24.fasta	86.377	1982	226	37	0.0	2124	Siganus vulpinus mitochondrion, complete genome	ref|NC_025588|
+consensus_medaka-45-24.fasta	86.343	1977	234	31	0.0	2122	Siganus guttatus mitochondrion, complete genome	gb|KJ420577|
+consensus_medaka-45-24.fasta	86.252	1993	216	50	0.0	2109	Caesio cuning voucher 94 mitochondrion, complete genome	gb|KP874185|
+consensus_medaka-45-24.fasta	85.859	1973	237	39	0.0	2060	Paracanthurus hepatus mitochondrion, complete genome	ref|NC_029237|
+consensus_medaka-45-24.fasta	85.801	1972	245	31	0.0	2058	Thunnus thynnus thynnus mitochondrion, complete genome	gb|AY302574|
+consensus_medaka-45-24.fasta	85.801	1972	244	32	0.0	2058	Thunnus thynnus thynnus mitochondrial DNA, complete genome	dbj|AB097669|
+consensus_medaka-45-24.fasta	85.758	1980	237	43	0.0	2052	Lutjanus sebae mitochondrion, complete genome	NC_012737_extraction
+# BLASTN 2.6.0+
+# Query: consensus_medaka-454-concatenated_2nd_round_003.fasta
+# Database: /mnt/c/Users/ooste189/Downloads/WORKdir/test2/test/BLASTdatabase/All_references_Burgers_20200707.fasta
+# Fields: query id, % identity, alignment length, mismatches, gap opens, evalue, bit score, subject titles, subject ids
+# 16 hits found
+consensus_medaka-454-concatenated_2nd_round_003.fasta	99.950	1998	1	0	0.0	3685	Kuhlia mugil isolate Ke_001 collection-date 01-May-2011 cytochrome b (CYTB) gene, partial cds; tRNA-Thr and tRNA-Pro genes, D-loop, tRNA-Phe, 12S ribosomal RNA, and tRNA-Val genes, complete sequence; and 16S ribosomal RNA gene, partial sequence; mitochondrial	gb|KC136385|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	99.747	1582	4	0	0.0	2900	Kuhlia mugil mitochondrial DNA, complete genome	dbj|AP011065|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	100.000	488	0	0	0.0	902	Kuhlia mugil mitochondrial DNA, complete genome	dbj|AP011065|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	88.004	2009	217	21	0.0	2353	Coreoperca loona mitochondrion, complete genome	gb|KJ644781|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	87.986	2006	222	17	0.0	2351	Siniperca scherzeri mitochondrial DNA, complete genome	dbj|AP014527|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	86.706	2016	236	29	0.0	2209	Monodactylus argenteus mitochondrial DNA, complete genome	dbj|AP009169|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	86.205	2008	249	26	0.0	2148	UNVERIFIED: Zebrasoma desjardinii mitochondrion sequence	gb|KU244264|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	86.155	2008	248	27	0.0	2141	Paracanthurus hepatus mitochondrion, complete genome	ref|NC_029237|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	86.075	2018	242	33	0.0	2134	Pterocaesio tile mitochondrion, complete genome	ref|NC_004408|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	86.070	2010	249	28	0.0	2132	Ctenochaetus striatus mitochondrion, complete genome	gb|KU244260|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	85.799	2021	247	33	0.0	2106	Caesio cuning voucher 94 mitochondrion, complete genome	gb|KP874185|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	85.827	2025	236	40	0.0	2102	Naso lopezi mitochondrial DNA, complete genome	dbj|AP009163|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	85.686	2012	256	28	0.0	2091	Lutjanus erythropterus mitochondrion, complete genome	gb|KP939271|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	85.728	2018	242	41	0.0	2089	Acanthurus leucosternon mitochondrion, complete genome	gb|EU136032|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	85.345	2013	261	31	0.0	2052	UNVERIFIED: Acanthurus nigrofuscus mitochondrion sequence	gb|KU244258|
+consensus_medaka-454-concatenated_2nd_round_003.fasta	85.380	2011	258	34	0.0	2052	UNVERIFIED: Acanthurus gahhm mitochondrion sequence	gb|KU244257|
+# BLASTN 2.6.0+
+# Query: consensus_medaka-534-concatenated_2nd_round_001.fasta
+# Database: /mnt/c/Users/ooste189/Downloads/WORKdir/test2/test/BLASTdatabase/All_references_Burgers_20200707.fasta
+# Fields: query id, % identity, alignment length, mismatches, gap opens, evalue, bit score, subject titles, subject ids
+# 15 hits found
+consensus_medaka-534-concatenated_2nd_round_001.fasta	99.591	1956	7	1	0.0	3567	Caesio cuning voucher 94 mitochondrion, complete genome	gb|KP874185|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	95.097	1958	86	9	0.0	3075	Pterocaesio tile mitochondrion, complete genome	ref|NC_004408|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	93.262	1959	115	15	0.0	2870	Lutjanus erythropterus mitochondrion, complete genome	gb|KP939271|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	91.242	1964	150	17	0.0	2654	Lutjanus sebae mitochondrion, complete genome	NC_012737_extraction
+consensus_medaka-534-concatenated_2nd_round_001.fasta	91.242	1964	150	17	0.0	2654	Lutjanus sebae mitochondrion, complete genome	gb|FJ824742|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	89.501	1962	187	16	0.0	2464	Monodactylus argenteus mitochondrial DNA, complete genome	dbj|AP009169|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	88.951	1964	187	24	0.0	2398	Siniperca scherzeri mitochondrial DNA, complete genome	dbj|AP014527|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	88.951	1964	188	22	0.0	2398	Coreoperca loona mitochondrion, complete genome	gb|KJ644781|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	88.702	1965	193	25	0.0	2372	Siganus guttatus mitochondrion, complete genome	gb|KJ420577|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	88.663	1967	192	27	0.0	2368	Siganus vulpinus mitochondrion, complete genome	ref|NC_025588|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	88.415	1968	197	23	0.0	2342	Siganus puellus mitochondrion, complete genome	gb|KF709954|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	87.430	1965	212	31	0.0	2228	Paracanthurus hepatus mitochondrion, complete genome	ref|NC_029237|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	87.049	1969	212	35	0.0	2183	Acanthurus leucosternon mitochondrion, complete genome	gb|EU136032|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	86.904	1970	223	29	0.0	2176	Plectorhinchus lineatus isolate SCAUA 120 mitochondrion, complete genome	ref|NC_025517|
+consensus_medaka-534-concatenated_2nd_round_001.fasta	86.890	1968	220	30	0.0	2170	Ctenochaetus striatus mitochondrion, complete genome	gb|KU244260|
+# BLAST processed 6 queries

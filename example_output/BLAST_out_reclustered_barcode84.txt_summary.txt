@@ -1,0 +1,11 @@
+BLAST_out_reclustered_barcode84
+# Fields: n sequences, cluster id, % identity, alignment length, mismatches, gap opens, evalue, bit score, subject titles
+120	3  			100.000 	1978 0 	0 	0.0 3653 Pomacanthus imperator mitochondrion, complete genome gb|KP218259|
+155	7  			96.660 	1976 51 	14 	0.0 3269 Lutjanus erythropterus mitochondrion, complete genome gb|KP939271|
+27	14  			99.950 	1994 0 	1 	0.0 3675 Rhinobatos cemiculus tRNA-Phe gene, partial sequence; 12S ribosomal RNA and tRNA-Val genes, complete sequence; and 16S ribosomal RNA gene, partial sequence; mitochondrial gb|EF100174|
+27	34  			95.667 	2008 76 	7 	0.0 3216 Naso lopezi mitochondrial DNA, complete genome dbj|AP009163|
+38	51  			99.700 	1997 4 	2 	0.0 3653 Lutjanus erythropterus mitochondrion, complete genome gb|KP939271|
+52	25  			83.164 	1972 287 	42 	0.0 1760 Bedotia geayi mitochondrial DNA, complete sequence dbj|AP017440|
+166	2nd_round_001  	99.751 	2008 5 	0 	0.0 3681 Caesio cuning voucher 94 mitochondrion, complete genome gb|KP874185|
+66	2nd_round_003  	100.000 	1964 0 	0 	0.0 3627 Platax orbicularis mitochondrion, complete genome NC_013136_extraction
+703	2nd_round_002  	99.900 	1994 2 	0 	0.0 3672 Kuhlia mugil isolate Ke_001 collection-date 01-May-2011 cytochrome b (CYTB) gene, partial cds; tRNA-Thr and tRNA-Pro genes, D-loop, tRNA-Phe, 12S ribosomal RNA, and tRNA-Val genes, complete sequence; and 16S ribosomal RNA gene, partial sequence; mitochondrial gb|KC136385|
