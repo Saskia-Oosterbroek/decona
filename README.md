@@ -1,6 +1,8 @@
 # Decona
 Version 0.1.1 Major bug-fix
 
+For more elaborate explanations please see the "Wiki" in the menu bar.
+
 ##  From demultiplexing to consensus for Nanopore amplicon data  
 Decona can process multiple samples in one line of code:
 - Mixed samples containing multiple species from bulk and eDNA
@@ -49,7 +51,6 @@ Will: Demultiplex, filter for read length 800-1200 bp and quality score 10, clus
 | Command | Function | 
 | ------ | ------ |
 | -h | help | 
-| -v | version | 
 | -p | plot read length distribution histogram. Not sure what your average read length is? Try this: $ decona -p |
 | -d | demultiplex samples |
 | -q | quality score (default 10) |
