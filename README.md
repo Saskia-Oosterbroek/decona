@@ -1,5 +1,5 @@
 # Decona
-Version 0.1.1 Major bug-fix
+Version 0.1.2 bug fixes, multithreading enabled & less accurate quick clustering algorithm enabled.
 
 For more elaborate explanations please see the "Wiki" in the menu bar.
 
@@ -37,7 +37,7 @@ Decona runs on all your favourite sequence processing tools:
 | Racon | 1.4.13 | Make first consensus sequences |
 | Medaka | 1.0.3 | Polish consensus sequences |
 | Medaka | 1.0.3 | SNP calling (to be verified for mixed samples) |
-| BLAST+ | 2.10.1 | Optional, needs additional install [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/) |
+| BLAST+ | 2.10.1 | Optional, needs additional install: [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/) |
 
 
 
@@ -50,19 +50,28 @@ $ decona -d -l 800 -m 1200 -q 10 -c 0.80 -n 100 -M
 Will: Demultiplex, filter for read length 800-1200 bp and quality score 10, cluster reads at 80% ID, make consensuses of clusters larger than 100 sequences, polish with Medaka.
 | Command | Function | 
 | ------ | ------ |
-| -h | help | 
-| -p | plot read length distribution histogram. Not sure what your average read length is? Try this: $ decona -p |
-| -d | demultiplex samples |
-| -q | quality score (default 10) |
-| -l | minimum length (default 300) |
-| -m | maximum length |
-| -c | clustering percentage, 0.8 = 80% identity (default 0.8) |
-| -w | clustering word length (default 5 )   [ -n 7 for thresholds 0.88 ~ 0.9 / -n 6 for thresholds 0.85 ~ 0.88 / -n 5 for thresholds 0.80 ~ 0.85 ] |
-| -n | cluster size: minimum amount of reads in a cluster to continue to consensus step (default 100) |
-| -M | polish consensus with Medaka |
-| -v | variant calling with Medaka |
-| -B | yourblastdatabase.fasta, fasta file can be used as blast database. ([NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/) tool needs to be installed! |
-| -b | /path/to/existing/blast/database Use this option if you already have a BLAST+ database on your system | 
-| -i | gives an overview of the percentage of sequences assigned to the clusters |
-| -r | re-cluster consensus sequences. It may happen that multiple clusters will arise containing one species. Reclustering will cluster the original fasta's based on the polished result at 99%. This may be especially important if you would like to do variant calling. |
-| -f | folder structure: your fastq files are already demultiplexed and stored in barcode folders such as data already demultiplexed by MinION Mk1C. |
+| -h   | help |
+|  -v   | version|
+|  -T    | multithreading default 4 |
+|  -p    | plot readlength distribution histogram (plots then exits program)|
+|  -f    | folder structure: your fastq files are already demultiplexed and stored in barcode folders (such as output from Mk1C)|
+| Filtering: | |
+|  -d    | demultiplex |
+|  -q    | quality score |
+|  -l    | minimum length |
+|  -m    | maximum length |
+| Clustering | |
+|  -c    | clustering percentage, 0.8 = 80% identity |
+|  -w    | clustering wordlength |
+|  -n    | clustersize default 100 |
+|  -i    | gives info about % sequences assigned to clusters |
+|  -r    | re-cluster consensus sequences (use a second round of clustering)|
+|  -g    | clustering algorithm: 1 or 0, default 1. |
+|       | If set to 1, the program will cluster reads into the most similar cluster that meets the threshold (accurate but slow mode)|
+|       | If set to 0 a sequence is clustered to the first cluster that meets the threshold (fast cluster)|
+| Polishing | |
+|  -M    | polish consensus with Medaka |
+|  -s    | snip/variant calling with Medaka |
+| BLAST | |
+|  -B    | yourblastdatabase.fasta |
+|  -b    | /path/to/existing/blast/database/existing-data-base-file.fasta |
