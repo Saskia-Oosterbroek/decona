@@ -1,5 +1,7 @@
 # Decona
-Version 0.1.2 bug fixes, multithreading enabled & less accurate quick clustering algorithm enabled.
+**Version 0.1.2** bug fixes, multithreading enabled & less accurate quick clustering algorithm enabled.
+
+[![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/SaskiaO13.svg?style=social&label=Follow%20%40SaskiaO13)](https://twitter.com/SaskiaO13)
 
 For more elaborate explanations please see the "Wiki" in the menu bar.
 
