@@ -13,6 +13,15 @@ Decona can process multiple samples in one line of code:
 
 <img src="https://raw.githubusercontent.com/Saskia-Oosterbroek/decona/master/Decona_overview.JPG" width="600" />
 
+## Presentation at DNAQUA International Conference
+[![](http://img.youtube.com/vi/e3mw2UuAdC8/0.jpg)](http://www.youtube.com/watch?v=e3mw2UuAdC8 "")
+
+- 00:00 general introduction
+- 02:20 Decona's core principles
+- 04:40 Examples from our own research
+  - 2000 bp fish mitochondrial marker
+  - Contaminated sponge COI
+  - Within species variation: porpoise eDNA from seawater 3.5 kb mitochondrial marker 
 
 ## Installation
 Decona is sensitive to installation version of dependencies. To keep things simple the installer will create a virtual Conda environment for you containing everything you need. All dependencies are included with exception of the BLAST+ command line application. If the BLAST function is desired it can be downloaded from  [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/).
