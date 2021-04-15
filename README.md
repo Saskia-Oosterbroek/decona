@@ -24,6 +24,8 @@ Decona can process multiple samples in one line of code:
   - Within species variation: porpoise eDNA from seawater 3.5 kb mitochondrial marker 
 
 ## Installation
+Currently Decona is only supported for use with Linux, the Ubuntu command line app for Windows also works but is recommended only for use with smaller datasets.
+
 Decona is sensitive to installation version of dependencies. To keep things simple the installer will create a virtual Conda environment for you containing everything you need. All dependencies are included with exception of the BLAST+ command line application. If the BLAST function is desired it can be downloaded from  [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/).
 
 ```sh
