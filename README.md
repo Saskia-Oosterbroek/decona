@@ -1,4 +1,14 @@
+
+## New paper (including Decona) available as preprint on Biorxiv
+
+### **High resolution species detection: accurate long read eDNA metabarcoding of North Sea fish using Oxford Nanopore sequencing**
+
+Karlijn Doorenspleet, Lara Jansen, Saskia Oosterbroek, Oscar Bos, Pauline Kamermans, Max Janse, Erik Wurz, Albertinka Murk, Reindert Nijland
+
+doi: https://doi.org/10.1101/2021.11.26.470087 
+
 # Decona [![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/SaskiaO13.svg?style=social&label=Follow%20%40SaskiaO13)](https://twitter.com/SaskiaO13)
+
 **Version 0.1.2** bug fixes, multithreading enabled & less accurate quick clustering algorithm enabled.
 
 For more elaborate explanations please see the "Wiki" in the menu bar.
