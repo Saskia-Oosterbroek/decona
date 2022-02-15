@@ -96,3 +96,11 @@ Will: Demultiplex, filter for read length 800-1200 bp and quality score 10, clus
 | BLAST | |
 |  -B    | yourblastdatabase.fasta |
 |  -b    | /path/to/existing/blast/database/existing-data-base-file.fasta |
+
+## Running Decona on the example data
+
+To run Decona on the example data:
+```sh
+decona -f -l 800 -m 2100 -q 10 -c 0.80 -n 25 -M
+```
+from one directory above `example_data/`. It will generate output in the directory `data/`.
