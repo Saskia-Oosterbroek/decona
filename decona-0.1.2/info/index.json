@@ -1,0 +1,11 @@
+{
+  "arch": "x86_64",
+  "build": "0",
+  "build_number": 0,
+  "depends": [],
+  "name": "decona",
+  "platform": "linux",
+  "subdir": "linux-64",
+  "timestamp": 1606753676183,
+  "version": "0.1.2"
+}
