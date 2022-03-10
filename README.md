@@ -5,7 +5,7 @@
 
 Karlijn Doorenspleet, Lara Jansen, Saskia Oosterbroek, Oscar Bos, Pauline Kamermans, Max Janse, Erik Wurz, Albertinka Murk, Reindert Nijland
 
-doi: https://doi.org/10.1101/2021.11.26.470087 
+doi: https://doi.org/10.1101/2021.11.26.470087
 
 # Decona [![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/SaskiaO13.svg?style=social&label=Follow%20%40SaskiaO13)](https://twitter.com/SaskiaO13)
 
@@ -13,7 +13,7 @@ doi: https://doi.org/10.1101/2021.11.26.470087
 
 For more elaborate explanations please see the "Wiki" in the menu bar.
 
-##  From demultiplexing to consensus for Nanopore amplicon data  
+##  From demultiplexing to consensus for Nanopore amplicon data
 Decona can process multiple samples in one line of code:
 - Mixed samples containing multiple species from bulk and eDNA
 - Mixed amplicons in one barcode
@@ -31,7 +31,7 @@ Decona can process multiple samples in one line of code:
 - 04:40 Examples from our own research
   - 2000 bp fish mitochondrial marker
   - Contaminated sponge COI
-  - Within species variation: porpoise eDNA from seawater 3.5 kb mitochondrial marker 
+  - Within species variation: porpoise eDNA from seawater 3.5 kb mitochondrial marker
 
 ## Installation
 Currently Decona is only supported for use with Linux, the Ubuntu command line app for Windows also works but is recommended only for use with smaller datasets.
@@ -64,12 +64,12 @@ Decona runs on all your favourite sequence processing tools:
 
 ## Usage
 **Decona works on all fastq files in your working directory.** It is a good idea to have an empty directory with just the files you want to run. A results folder will appear in your working directory after a successful run.
-Example 
-```sh 
-$ decona -d -l 800 -m 1200 -q 10 -c 0.80 -n 100 -M 
+Example
+```sh
+$ decona -d -l 800 -m 1200 -q 10 -c 0.80 -n 100 -M
 ```
 Will: Demultiplex, filter for read length 800-1200 bp and quality score 10, cluster reads at 80% ID, make consensuses of clusters larger than 100 sequences, polish with Medaka.
-| Command | Function | 
+| Command | Function |
 | ------ | ------ |
 | -h   | help |
 |  -v   | version|
@@ -96,3 +96,11 @@ Will: Demultiplex, filter for read length 800-1200 bp and quality score 10, clus
 | BLAST | |
 |  -B    | yourblastdatabase.fasta |
 |  -b    | /path/to/existing/blast/database/existing-data-base-file.fasta |
+
+## Running Decona on the example data
+
+To run Decona on the example data:
+```sh
+decona -f -l 800 -m 2100 -q 10 -c 0.80 -n 25 -M
+```
+from one directory above `example_data/`. It will generate output in the directory `data/`.
