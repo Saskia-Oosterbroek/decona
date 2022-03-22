@@ -69,6 +69,16 @@ fi
 # Get the location of this script's path to determine where we find the environment definition and the decona executable.
 script_path=$(dirname "$(realpath "$0")")
 
+# Build CD-HIT before trying to make the environment, we want to see any errors from this build before starting the
+# lengthy process of generating an Anaconda environment.
+echo "Building CD-HIT..."
+cd_hit_path="$script_path/../external/cdhit"
+cd "$cd_hit_path" && make > /dev/null
+if [ $? != 0 ]; then
+    echo "Failed to build CD-HIT, did you clone the repository without --recurse-submodules?"
+    echo "In that case, try running 'git submodule update --init' to also retrieve CD-HIT."
+fi
+
 echo "Creating Python environment and installing packages, this might take a long time..."
 env_file="$script_path/decona.yml"
 if [ -z "$prefix" ]; then
@@ -83,7 +93,12 @@ else
     activation_name="$prefix"
 fi
 
-# Copy the decona executable to the bin/ directory of the environment to make it available on the PATH.
-cp "$script_path/../decona" "$prefix/bin/decona"
+echo "Integrating CD-HIT and Decona with the Python environment..."
+ln -s "$script_path/../decona" "$prefix/bin/decona"
 
-echo "Installed Decona and create a new Python environment; use 'conda activate $activation_name' to activate it, then run 'decona'."
+# The following CD-HIT executables are used in Decona.
+ln -s "$script_path/../external/cdhit/cd-hit-est" "$prefix/bin"
+ln -s "$script_path/../external/cdhit/plot_len1.pl" "$prefix/bin"
+ln -s "$script_path/../external/cdhit/make_multi_seq.pl" "$prefix/bin"
+
+echo "Installed Decona and created a new Python environment; use 'conda activate $activation_name' to activate it, then run 'decona'."
