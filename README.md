@@ -66,9 +66,9 @@ Decona runs on all your favourite sequence processing tools:
 **Decona works on all fastq files in your working directory.** It is a good idea to have an empty directory with just the files you want to run. A results folder will appear in your working directory after a successful run.
 Example
 ```sh
-$ decona -d -l 800 -m 1200 -q 10 -c 0.80 -n 100 -M
+$ decona -d -l 800 -m 2100 -q 10 -c 0.80 -n 100 -M
 ```
-Will: Demultiplex, filter for read length 800-1200 bp and quality score 10, cluster reads at 80% ID, make consensuses of clusters larger than 100 sequences, polish with Medaka.
+Will: Demultiplex, filter for read length 800-2100 bp and quality score 10, cluster reads at 80% ID, make consensuses of clusters larger than 100 sequences, polish with Medaka.
 | Command | Function |
 | ------ | ------ |
 | -h   | help |
@@ -103,4 +103,6 @@ To run Decona on the example data:
 ```sh
 decona -f -l 800 -m 2100 -q 10 -c 0.80 -n 25 -M
 ```
-from one directory above `example_data/`. It will generate output in the directory `data/`.
+from within the directory `example_data/`. It will generate output in the directory `data/`.
+
+If you want to use the BLAST function you can [install NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/) in the Decona environment.
