@@ -6,7 +6,6 @@ channels:
 dependencies:
   - python=3.8
   # Primary dependencies
-  - cd-hit=4.8.1
   - medaka=1.1.2
   - minimap2=2.17
   - nanofilt=2.7.1
