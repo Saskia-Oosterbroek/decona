@@ -1,3 +1,3 @@
 [submodule "external/cdhit"]
 	path = external/cdhit
-	url = git@github.com:weizhongli/cdhit.git
+	url = https://github.com/weizhongli/cdhit.git
