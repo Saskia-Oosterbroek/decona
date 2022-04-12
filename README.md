@@ -9,7 +9,10 @@ doi: https://doi.org/10.1101/2021.11.26.470087
 
 # Decona [![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/SaskiaO13.svg?style=social&label=Follow%20%40SaskiaO13)](https://twitter.com/SaskiaO13)
 
-**Version 0.1.2** bug fixes, multithreading enabled & less accurate quick clustering algorithm enabled.
+**Version 1.3**
+- Installation process edited
+- **New functions added:** -k makes Kmer length adjustable, -R enables subsampling of large clusters
+- Bugs fixed
 
 For more elaborate explanations please see the "Wiki" in the menu bar.
 
@@ -82,18 +85,20 @@ Will: Demultiplex, filter for read length 800-2100 bp and quality score 10, clus
 |  -l    | minimum length |
 |  -m    | maximum length |
 | Clustering | |
-|  -c    | clustering percentage, 0.8 = 80% identity |
-|  -w    | clustering wordlength |
-|  -n    | clustersize default 100 |
+|  -c    | clustering percentage (default 0.8 for 80% identity) |
+|  -w    | clustering wordlength (default 5) |
+|  -n    | clustersize (default 100) |
 |  -i    | gives info about % sequences assigned to clusters |
 |  -r    | re-cluster consensus sequences (use a second round of clustering)|
-|  -g    | clustering algorithm: 1 or 0, default 1. |
+|  -g    | clustering algorithm: 1 or 0 (default 1) |
 |       | If set to 1, the program will cluster reads into the most similar cluster that meets the threshold (accurate but slow mode)|
 |       | If set to 0 a sequence is clustered to the first cluster that meets the threshold (fast cluster)|
+| **-R**  | **Randomly subsample each clusters till maximum size of n (optional, not used by default)** |
+|  **-k**   | **set custom kmer length, short reads require smaller kmer length (default 15)** |
 | Polishing | |
 |  -M    | polish consensus with Medaka |
 |  -s    | snip/variant calling with Medaka |
-| BLAST | |
+| BLAST | Optional, needs additional install: [NCBI BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK52640/) |
 |  -B    | yourblastdatabase.fasta |
 |  -b    | /path/to/existing/blast/database/existing-data-base-file.fasta |
 
