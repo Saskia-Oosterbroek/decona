@@ -1,14 +1,7 @@
 #!/bin/bash
-# Cluster size minimum set at 5
-# Kmer length option -> added
-# Minimum length removed, exit added if  <300 is not combined with -k <15
-# Cluster maximum size (subsampling) -> Added
-# Fasta file added in results with all barcodes combined
-
 set -eu
 start=$SECONDS
-
-VERSIONnr=0.1.3
+VERSIONnr=1.4
 DEMULTIPLEX=no
 QSCORE=10
 LENGTH=300
@@ -23,11 +16,14 @@ BLASTDB=no
 BLASTdir=no
 CLUSTERinfo=no
 FOLDER_STRUCTURE=no
-MULTITHREAD=4
-CLUSTprog=1
+MULTITHREAD=8
 Kmer=15
 CLUSTERmax=no
 integer=^[0-9]+$
+OTUcall=no
+gADAPT=FALSE
+aADAPT=FALSE
+Input_path=FALSE
 
 usage() {
   echo "Usage: $0
@@ -35,21 +31,23 @@ usage() {
   -v    version
   -T    multithreading default 4
   -p    plot readlength distribution histogram (plots then exits program)
+  -i    Input path
   -f    folder structure: your fastq files are already demultiplexed and stored in barcode folders (such as output from Mk1C)
 Filtering:
   -d    DEMULTIPLEX
   -q    quality score
-  -l    minimum length
-  -m    maximum length
+  -l    minimum length (if used in combination with adapter/primer removal this is the length AFTER removal)
+  -m    maximum length (if used in combination with adapter/primer removal this is the length AFTER removal))
+  -a    Reverse adapter: (reverse complemented!):Regular 3' adapter/primer ie: -a '"'TGRTTYTTYGGNCAYCCNGARGTNTA;max_error_rate=0.1;min_overlap=22'"'
+  -g    Forward adapter: Regular 5' adapter/primer ie: -g '"'GGWACWGGWTGAACWGTWTAYCCYCC;max_error_rate=0.1;min_overlap=20'"' 
+        Linked adapter: -g '"'GGWACWGGWTGAACWGTWTAYCCYCC;max_error_rate=0.1;min_overlap=20...TGRTTYTTYGGNCAYCCNGARGTNTA;max_error_rate=0.1;min_overlap=22'"' 
+        (See Cutadapt: cutadapt.readthedocs.io)
 Clustering
   -c    clustering percentage, 0.8 = 80% identity
   -w    clustering wordlength
   -n    clustersize default 100
-  -i    gives info about % of filtered sequences that got assigned to clusters
   -r    re-cluster consensus sequences (use a second round of clustering)
-  -g    clustering algorithm: 1 or 0, default 1.
-        If set to 1, the program will cluster reads into the most similar cluster that meets the threshold (accurate but slow mode)
-        If set to 0 a sequence is clustered to the first cluster that meets the threshold (fast cluster)
+  -o    Call OTU's at %, -o 0.98 calls OTU's at 98% sequence similarity of consensus sequences across barcodes
   -R    Randomly subsample clusters till maximum size of n
   -k    kmer length
 Polishing
@@ -66,42 +64,41 @@ exit_abnormal() {
   exit 1
 }
 
-
-
-while getopts "hdq:l:m:c:w:n:MvB:b:iprfsT:g:R:k:" options; do
-
-
-  case "${options}" in
+while getopts "hdq:l:m:c:w:n:MvB:b:i:prfsT:g:a:R:k:o:" options; do
+    case "${options}" in
     h)
-      usage
-      exit 1
-      ;;
+        usage
+        exit 1
+        ;;
     v)
-      echo "This is Decona $VERSIONnr"
-      exit 1
-      ;;
+        echo "This is Decona $VERSIONnr"
+        exit 1
+        ;;
     d)
-      DEMULTIPLEX="yes"
-      ;;
+        DEMULTIPLEX="yes"
+        ;;
     q)
-      QSCORE=${OPTARG}
-      if ! [[ $QSCORE =~ $integer ]] ; then
+        QSCORE=${OPTARG}
+        if ! [[ $QSCORE =~ $integer ]] ; then
         echo "Error: QSCORE must be a positive, whole number."
         exit 1
-      elif [ "$QSCORE" -eq "0" ]; then
+        elif [ "$QSCORE" -eq "0" ]; then
         echo "Error: QSCORE must be greater than zero."
         exit 1
         fi
-      ;;
+        ;;
     l)
         LENGTH=${OPTARG}
         if ! [[ $LENGTH =~ $integer ]] ; then
         echo "Error: Minimum length must be a positive, whole number."
         exit 1
-        elif ! [ "$LENGTH" -ge "100" ]; then
+        elif ! [ "$LENGTH" -ge "30" ]; then
         echo "Error: Minimum length should be 100 bp or longer. Decona is developed for longer reads and may not work properly when using shorter reads."
         exit 1
         fi
+        ;;
+    o)
+        OTUcall=${OPTARG}
         ;;
     m)
         MAXLENGTH=${OPTARG}
@@ -146,27 +143,23 @@ while getopts "hdq:l:m:c:w:n:MvB:b:iprfsT:g:R:k:" options; do
         fi
         ;;
     B)
-      BLASTDB=${OPTARG}
-      if ! [[ $BLASTDB = *.fasta ]] ; then
+        BLASTDB=${OPTARG}
+        if ! [[ $BLASTDB = *.fasta ]] ; then
         echo "-B: to create your blast database input files should be in .fasta format"
         exit 1
-      fi
-      ;;
+        fi
+        ;;
     b)
-      BLASTdir=${OPTARG}
-      if ! [ -f $BLASTdir ] && ! [ ${BLASTdir: -6} == ".fasta" ] ; then
-        echo "-b: $BLASTdir -> no fasta file found at $BLASTdir"
-        exit 1
-      fi
-      ;;
+        BLASTdir=${OPTARG}
+        ;;
     i)
-      CLUSTERinfo="yes"
-      if [ -e result/percentage_per_barcode.txt ] ; then
-        echo "File - total filtered sequences - sequences in cluster - percentage sequences in cluster"
-        cat result/percentage_per_barcode.txt
-      fi
-      ;;
-    p) # plot readlength distribution from fastq files
+        Input_path=${OPTARG}
+        if ! [ -d $Input_path ] ; then
+        echo "Input error: "$Input_path", no such directory"
+        exit 1
+        fi
+        ;;
+    p)  # plot readlength distribution from fastq files
         awk 'NR%4 == 2 {lengths[length($0)]++} END {for (l in lengths) {print l, lengths[l]}}' *.fastq | sort -n | perl -lane 'print $F[0], "\t", "*" x ($F[1] / 100)' | awk 'NF >= 2'
         exit 1
         ;;
@@ -178,30 +171,31 @@ while getopts "hdq:l:m:c:w:n:MvB:b:iprfsT:g:R:k:" options; do
         fi
         ;;
     g)
-        CLUSTprog=${OPTARG}
-        if ! [ "$CLUSTprog" == "1" ] && ! [ "$CLUSTprog" == "0" ] ; then
-        echo "Error: -g must be 1 or 0
-        If set to 1, the program will cluster it into the most similar cluster that meet the threshold (accurate but slow mode)
-        If set to 0 a sequence is clustered to the first cluster that meet the threshold (fast cluster)"
-        exit 1
-        fi
+        gADAPT=${OPTARG}
         ;;
-
+    a)
+        aADAPT=${OPTARG}
+        ;;
     r)
         RECLUSTER="yes"
         ;;
     f)
-      FOLDER_STRUCTURE="yes"
-      ;;
+        FOLDER_STRUCTURE="yes"
+        ;;
     :)
-      echo "Error: -${OPTARG} requires an argument."
-      exit_abnormal
-      ;;
+        echo "Error: -${OPTARG} requires an argument."
+        exit_abnormal
+        ;;
     *)
-      exit_abnormal
-      ;;
-  esac
+        exit_abnormal
+        ;;
+    esac
 done
+
+if [ $Input_path = FALSE ]; then
+echo "Input error: please specify input folder"
+exit 1
+fi
 
 if ! [ "$LENGTH" -ge "300" ] && [ "$Kmer" -ge "15" ] ; then
 echo "Waring: When using a short fragment (<300 bases) please adjust kmer length ( -k ) accordingly"
@@ -220,8 +214,26 @@ BLASTdir=$(<BLASTdatabase/BlastDBlocation)/$BLASTDB
 echo "new blast database created in:  $BLASTdir"
 fi
 
+blast_function () {
+    echo "blasting $blast_file"
+    blastn -query "$blast_file" -db "$BLASTdir" -outfmt "7 qseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen sseqid salltitles sallseqid" -max_target_seqs 15 -max_hsps 500 -num_threads "$MULTITHREAD" > "$blast_file"_out || echo "Error with Blast" | tee -a Decona_logfile.txt ;
+    #summary file
+    for result in *_out ; do
+    cat "$result"  | sed 's/# Query: //' | sed '/^#/d'| sort -n -r -k2 | sort -u -k1,1  | sed 's/^/'"$result"'\t/' | sed 's/reclusterd_fastas_//' | sed 's/.fasta_out//' | \
+    sed 's/.fasta/\t/g' | sed 's/|/\t/g' | awk '{print $1,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$2}' | sed 's/ /\t/g' >> All_summary.txt
+    done
+    
+    #Rscript_input
+    for result in "$blast_file"_out ; do
+    Total_ReadCount=$(cat "$blast_file" | grep "^>" | cut -d "-" -f3 | awk '{SUM+=$1}END{print SUM}');
+    cat "$blast_file"_out | sed 's/# Query: //' | sed '/^#/d' | sed 's/^/'"$Total_ReadCount"'\t/' | sed 's/^/'"$blast_file"'\t/' | sed 's/all_reclusterd_fastas_//' | sed 's/reclusterd_fastas_//' | \
+    sed 's/.fasta//g' | sed 's/medakas_//' | sed 's/polisheds_//' | sed 's/_concatenated//' | awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16}' | sed 's/ /\t/g' >> finalblastoutput.txt
+    done
+}
+
 if [ $FOLDER_STRUCTURE = "yes" ] ; then
-    mkdir data
+cd "$Input_path"    
+mkdir data
     for folder in * ; do
     if [ -d "$folder" ] ; then
     (
@@ -237,6 +249,54 @@ if [ $FOLDER_STRUCTURE = "yes" ] ; then
     cd data/
 fi
 
+### Creating Decona log file ###
+NanoFiltVersion=$(NanoFilt -v || :)
+MinimapVersion=$(minimap2 --version || :)
+RaconVersion=$(racon --version || :)
+MedakaVersion=$(medaka --version || :)
+BlastnVersion=$(blastn -version || :)
+WorkDir=$(pwd)
+now=$(date +'%d/%B/%Y %R')
+
+echo "
+Decona logfile, date "$now"
+Run in folder "$WorkDir"
+Decona version: "$VERSIONnr"
+--------------------------
+
+### Dependency versions ###
+"$NanoFiltVersion"
+Minimap2 "$MinimapVersion"
+Racon: "$RaconVersion"
+"$MedakaVersion"
+"$BlastnVersion"
+--------------------------
+
+### Settings used ###
+Input folder: "$Input_path"
+Demultiplex: "$DEMULTIPLEX"
+Minimum Q score filter: "$QSCORE"
+Minimum read length filter: "$LENGTH"
+Maximun read length filter: "$MAXLENGTH"
+Cluster threshold percentage: "$CLUSTERING"
+Reclustering: "$RECLUSTER"
+Wordlength: "$WORDLENGTH"
+Polish with Medaka: "$MEDAKA"
+Call variants with Medaka: "$VARIANT"
+Minimum cluster size to keep: "$CLUSTERSIZE"
+Make blast database from fasta: "$BLASTDB"
+Use existing blast database: "$BLASTdir"
+Raw fastq files are stored in multiple folders: "$FOLDER_STRUCTURE"
+Multithread: "$MULTITHREAD" threads 
+Kmer length: "$Kmer"
+Randomly subsample large cluster to: "$CLUSTERmax" reads maximum
+Call OTU's at: "$OTUcall"
+Cut adapters with cutadapt: "$gADAPT"
+Cut adapters with cutadapt: "$aADAPT"
+--------------------------
+"  > Decona_logfile.txt
+
+
 if [ $DEMULTIPLEX == "yes" ] ; then
 #Filter data on size and quality with NanoFilt
     raw_seq="$(cat *.fastq | grep "runid" | wc -l)"
@@ -245,14 +305,12 @@ if [ $DEMULTIPLEX == "yes" ] ; then
     cat *.fastq | NanoFilt -q "$QSCORE" -l "$LENGTH" --maxlength "$MAXLENGTH" > temporary_filtered/Q"$QSCORE"_filt.fastq
     echo "Data filtered with NanoFilt"
 
-
     for folder in ./temporary_filtered ; do
     if [ -e "$folder" ] ; then
     filtered_seq="$(cat "$folder"/*_filt.fastq | grep "runid" | wc -l)"
     echo "total raw sequences = $raw_seq"
     echo "total filtered sequences = $filtered_seq"
         (
-
         cd "$folder" || exit ;
             mv *.fastq ..
         )
@@ -265,19 +323,14 @@ if [ $DEMULTIPLEX == "yes" ] ; then
     cat *_filt.fastq | qcat --min-score 65 --detect-middle --trim -b demultiplexed_data -t "$MULTITHREAD"
 
     cd demultiplexed_data || exit
-    echo "Data demultiplexed, working directory changed to: ";
-    pwd ;
+    echo "Data demultiplexed, working directory changed to: " pwd ;
 
     #loop to transform fastq to fasta
-    echo "Fastq reads are being transformed to fasta" ;
-
     for file in barcode* ; do
     if [ -e "$file" ] ; then
-    cat "$file" | grep -A 1 'runid' | sed '/^--$/d' | sed 's/^@/>/' | awk '{print $1}' > "${file%%.*}.fasta" ;
+    cat "$file" | sed -n '1~4 s/^@/>/p; 2~4p' > "${file%%.*}.fasta" ;
     fi
     done ;
-
-    echo "Transforming fastq to fasta Complete" ;
 
     #Files will be placed in a folder acording to fastq name
     for files in barcode*.fast* ; do
@@ -292,16 +345,35 @@ else
     #Filter data on size and quality with NanoFilt
     raw_seq="$(cat *.fastq | grep "runid" | wc -l)"
     mkdir temporary_filtered
-    for fastq in *.fastq ;
-    do
-    echo "Filtering data $fastq..."
-    cat "$fastq" | NanoFilt -q "$QSCORE" -l "$LENGTH" --maxlength "$MAXLENGTH" > temporary_filtered/${fastq}_Q${QSCORE}_filt.fastq
+    mkdir temporary_filtered2
+    for fastq in *.fastq ; do
+        echo "$(date +'%d/%B/%Y %R') Filtering data $fastq..." | tee -a Decona_logfile.txt
+        if [ "$gADAPT" =  "FALSE" ] && [ "$aADAPT" =  "FALSE" ] ; then
+        cat "$fastq" | NanoFilt -q "$QSCORE" -l "$LENGTH" --maxlength "$MAXLENGTH" > temporary_filtered/${fastq}_Q${QSCORE}_filt.fastq
+        elif ! [ "$gADAPT" =  "FALSE" ] || ! [ "$aADAPT" =  "FALSE" ] ; then
+        cat "$fastq" | NanoFilt -q "$QSCORE" > temporary_filtered/${fastq}_Q${QSCORE}_filt.fastq
+        fi
     done
-    echo "Data filtered with NanoFilt"
+    
+    for fastq in *.fastq ; do
+        if ! [ "$gADAPT" =  "FALSE" ] && [ "$aADAPT" =  "FALSE" ] ;then
+        echo "$gADAPT"
+        echo "$aADAPT"
+        echo "check"
+            cutadapt -g "$gADAPT" --rc --match-read-wildcards --times 50 -j 0 -m "$LENGTH" -M "$MAXLENGTH" --discard-untrimmed -o temporary_filtered2/${fastq}_Q${QSCORE}_filt.fastq temporary_filtered/${fastq}_Q${QSCORE}_filt.fastq ;
+        elif [ "$gADAPT" =  "FALSE" ] && ! [ "$aADAPT" =  "FALSE" ] ; then
+            cutadapt -a "$aADAPT" --rc --match-read-wildcards --times 50 -j 0 -m "$LENGTH" -M "$MAXLENGTH" --discard-untrimmed -o temporary_filtered2/${fastq}_Q${QSCORE}_filt.fastq temporary_filtered/${fastq}_Q${QSCORE}_filt.fastq ;
+        elif ! [ "$gADAPT" =  "FALSE" ] && ! [ "$aADAPT" =  "FALSE" ] ; then
+            cutadapt -g "$gADAPT" -a "$aADAPT" --rc --match-read-wildcards --times 50 -j 0 -m "$LENGTH" -M "$MAXLENGTH" --discard-untrimmed -o temporary_filtered2/${fastq}_Q${QSCORE}_filt.fastq temporary_filtered/${fastq}_Q${QSCORE}_filt.fastq
+        else echo "adapters/primers $fastq not trimmed"
+        cp temporary_filtered/* temporary_filtered2/
+    fi
+    done
+    
     echo "Data not demultiplexed";
     #loop to transform fastq to fasta
 
-    for folder in ./temporary_filtered ; do
+    for folder in ./temporary_filtered2 ; do
     if [ -e "$folder" ] ; then
     filtered_seq="$(cat "$folder"/*_filt.fastq | grep "runid" | wc -l)"
     echo "total raw sequences = $raw_seq"
@@ -311,19 +383,38 @@ else
             echo "Fastq reads are being transformed to fasta" ;
             for i in *filt.fastq ;  do
             if [ -e "$i" ] ; then
-            cat "$i" | grep -A 1 'runid' | sed '/^--$/d' | sed 's/^@/>/' | awk '{print $1}' > "${i%%.*}.fasta" ;
+            cat "$i" | sed -n '1~4 s/^@/>/p; 2~4p'  > "${i%%.*}.fasta" ;
             mv *.fasta ..
             fi
             done
             mv *.fastq ..
         )
+    else
+        for folder in ./temporary_filtered ; do
+        if [ -e "$folder" ] ; then
+        filtered_seq="$(cat "$folder"/*_filt.fastq | grep "runid" | wc -l)"
+        echo "total raw sequences = $raw_seq"
+        echo "total filtered sequences = $filtered_seq"
+        (
+        cd "$folder" || exit ;
+            echo "Fastq reads are being transformed to fasta" ;
+            for i in *filt.fastq ;  do
+            if [ -e "$i" ] ; then
+            cat "$i" | sed -n '1~4 s/^@/>/p; 2~4p'  > "${i%%.*}.fasta" ;
+            mv *.fasta ..
+            fi
+            done
+            mv *.fastq ..
+        )
+        fi
+        done
     fi
     done
 
     rm -r temporary_filtered
+    rm -r temporary_filtered2
 
-
-    echo "Transforming fastq to fasta Complete" ;
+ echo "$(date +'%d/%B/%Y %R') Transforming fastq to fasta Complete" | tee -a Decona_logfile.txt;
 
     #Files will be placed in a folder acording to fastq name
     for file in *.fast* ; do
@@ -338,7 +429,7 @@ else
 
 fi
 
-
+echo "$(date +'%d/%B/%Y %R') Start clustering reads..." | tee -a Decona_logfile.txt ;
 # Clustering reads to make a list of most abundant, representative reads
 echo "Clustering reads..." ;
 for folder in */ ; do
@@ -350,11 +441,11 @@ echo "Clustering $folder..." ;
     for fasta in *.fasta ; do
     if [ -e "$fasta" ] ; then
     # This is the actual clustering command
-    cd-hit-est -i "$fasta" -o cluster_representatives -c $CLUSTERING -n "$WORDLENGTH" -d 0 -M 0 -T "$MULTITHREAD" -g "$CLUSTprog" > report_"${fasta%.*}.txt";
+    cd-hit-est -i "$fasta" -o cluster_representatives -c $CLUSTERING -n "$WORDLENGTH" -d 0 -M 0 -T "$MULTITHREAD" -g 1 > report_"${fasta%.*}.txt";
     mv cluster_representatives cluster_representatives.fa
     # Read distribution will be summarized in report_***.txt within the folder.
     plot_len1.pl *.clstr \
-    1,2-4,5-9,10-19,20-49,50-99,100-299,300-499,500-999,1000-1999,2000-4999,5000-9999,10000-100000  \ >> size_report_"$fasta".txt ;
+    1,2-4,5-9,10-19,20-49,50-99,100-299,300-499,500-999,1000-1999,2000-2999,3000-3999,4000-4999,5000-5999,6000-6999,7000-7999,8000-8999,9000-9999,10000-100000  \ >> size_report_"$fasta".txt ;
     # Create files with clusters of a certain size
     make_multi_seq.pl *.fasta *.clstr multi-seq "$CLUSTERSIZE" ;
     fi
@@ -362,8 +453,9 @@ echo "Clustering $folder..." ;
 )
 fi
 done
-echo "Clustering complete." ;
 
+
+echo "$(date +'%d/%B/%Y %R') Building Racon consensus sequences..." | tee -a Decona_logfile.txt ;
 # Allign with minimap2 and assemble with Racon
 for folder in */ ; do
 if [ -e "$folder"/multi-seq ] ; then
@@ -386,7 +478,7 @@ cd "$folder"/"multi-seq" || exit ;
     # # Subsampling large datasets # #
         if ! [ "$CLUSTERmax" = "no" ] ; then
         for file in *.fa ;  do
-        awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);} END {printf("\n");}' < "${file}" | awk 'NR>1{ printf("%s",$0); n++; if(n%2==0) { printf("\n");} else { printf("\t");} }' | awk -v k="$CLUSTERmax" 'BEGIN{srand(systime() + PROCINFO["pid"]);}{s=x++<k?x-1:int(rand()*x);if(s<k)R[s]=$0}END{for(i in R)print R[i]}' | awk -F"\t" '{print $1"\n"$2 > "'"subsampled_"$CLUSTERmax"-${file}"'"}'
+        awk '{print $1}' < "${file}"| awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);} END {printf("\n");}' | awk 'NR>1{ printf("%s",$0); n++; if(n%2==0) { printf("\n");} else { printf("\t");} }' | awk -v k="$CLUSTERmax" 'BEGIN{srand(systime() + PROCINFO["pid"]);}{s=x++<k?x-1:int(rand()*x);if(s<k)R[s]=$0}END{for(i in R)print R[i]}' | awk -F"\t" '{print $1"\n"$2 > "'"subsampled_"$CLUSTERmax"-${file}"'"}'
             for file in subsampled_*.fa ;  do
             if [ -e "${file}" ] ; then
             echo "Aligning and making draft assembly of $file...";
@@ -426,18 +518,20 @@ done
 
 
 if [ $MEDAKA == "yes" ] ; then
-    #Polish the Racon secuence with Medaka
+echo "$(date +'%d/%B/%Y %R') Start polishing consensus sequences with Medaka..." | tee -a Decona_logfile.txt ;
+     #Polish the Racon secuence with Medaka
     for folder in */ ; do
     if [ -e "$folder"/multi-seq ] ; then
     (
     cd "$folder"/"multi-seq" || exit ;
         for fa in *.fa ;  do
-        if [ -e "polished_${fa}sta" ] ; then
+        if [ -s "polished_${fa}sta" ] && ! [ -d consensus_medaka_"$fa" ]; then
         echo "polishing ${fa} Racon sequence with Medaka..."
-        medaka_consensus -i "${fa}" -d "polished_${fa}sta" -o "consensus_medaka_${fa}" -t "$MULTITHREAD" ;
+        medaka_consensus -i "${fa}" -d "polished_${fa}sta" -o "consensus_medaka_${fa}" -t "$MULTITHREAD" || echo "Medaka polishing "${fa}" failed." > failed_polishing_files.txt  ;
+        echo "Done polishing ${fa}";
         fi
         done
-    echo "Done polishing ${fa}";
+ 
     )
     fi
     done
@@ -463,46 +557,31 @@ if [ $MEDAKA == "yes" ] ; then
 
 
     #Blast all Medaka assembled sequences, make a summary output of first hit in blast per sequence.
-    for folder in */ ; do
+    for folder in * ; do
         if [ -e "$folder"/multi-seq ] ; then
+        echo "$(date +'%d/%B/%Y %R') If you are NOT reclustering reads BLAST for Medaka polished sequences should start now..." | tee -a Decona_logfile.txt ;
         (
             cd "$folder"/"multi-seq" || exit ;
             for con in consensus_medaka_*.fasta ; do
-            if [ -e "$con" ] ; then
-            cat "$con" | awk '{print $1}' > n-"$con" ;
-            sed -i ' 1 s/.*/&_'"$con"'/' n-"$con" ;
-            sed -i 's/>.*consensus_medaka_/>consensus_medaka-/' n-"$con" ;
-            else continue ;
-            fi
+                if [ -e "$con" ] ; then
+                cat "$con" | awk '{print $1}' > n-"$con" ;
+                sed -i ' 1 s/.*/&_'"$con"'/' n-"$con" ;
+                sed -i 's/>.*consensus_medaka_/>consensus_medaka-/' n-"$con" ;
+                else continue ;
+                fi
             done
 
             if [ `ls -1 n-con*.fasta 2>/dev/null | wc -l ` -gt 0 ]; then
             cat n-con*.fasta >> all_medaka_fastas.fasta ;
+            cp all_medaka_fastas.fasta "medaka_fastas_${folder}.fasta" ;        
+            fi
 
-            if  [ -f $BLASTdir ] || [ -f $BLASTdir.fasta ] || [ -f $BLASTdir.nsi ] || [ -f $BLASTdir.nin ] || [ -f $BLASTdir.fasta.nsi ] || [ -f $BLASTdir.fasta.nin ]; then
-            echo "Blasting consensus sequences $folder"
-            blastn -query all_medaka_fastas.fasta -db "$BLASTdir" -perc_identity 80 -outfmt "7 qseqid pident length mismatch gapopen evalue bitscore salltitles sallseqid" -max_target_seqs 20 -max_hsps 500 -num_threads "$MULTITHREAD" > BLAST_out_Medaka_clusters.txt ;
-
-            for result in BLAST_out_Medaka_clusters.txt ; do
-            cat "$result" | grep -A 4 'Query' | sed '/^--$/d' | sed '/^# BLASTN/d' | sed '/^# Database/d' | sed '/^# Fields/d' | sed '/. hits found/d' | sed -e :a -e '$!N;s/\npolished-/ /;ta' -e 'P;D' | sed -e :a -e '$!N;s/\nconsensus_medaka/ /;ta' -e 'P;D' | sed 's/# Query: //' | awk '{$2=""; print $0}' > summary_"$result"
-            sed -i 's/consensus_medaka-//' summary_"$result"
-            sed -i 's/polished-//' summary_"$result"
-            sed -i 's/-/\t/' summary_"$result"
-            sed -i 's/-/\t/' summary_"$result"
-            sed -i 's/.fasta//' summary_"$result"
-            sed -i 's/concatenated_//' summary_"$result"
-            sed -i 's/_clust//' summary_"$result"
-            sed -i '/^#  processed /d' summary_"$result"
-            sed -i '1 i\n_sequences, cluster_id, query_id, %_identity, alignment_length, mismatches, gap_opens, evalue, bit_score, subject_titles' "$result"
-            sed -i '1 i\'"$result"'' summary_"$result"
-            sed -i 's/BLAST_out_medaka_clusters_//' summary_"$result"
-            sed -i 's/.txt//' summary_"$result"
-            echo " " >> summary_"$result"
-            cat summary_"$result" | sed '/^# Fields/d' >> All_summary_Medaka.txt
-            sed -i '1 i\n_sequences, cluster_id, query_id, %_identity, alignment_length, mismatches, gap_opens, evalue, bit_score, subject_titles' All_summary_Medaka.txt
+            if [[ $RECLUSTER = "no" ]] ; then
+            for blast_file in medaka_fastas_${folder}.fasta ; do
+            blast_function
             done
             fi
-            fi
+            
         )
         fi
     done
@@ -515,7 +594,7 @@ fi
 
     for folder in * ; do
     if [ -d "$folder"/multi-seq ] ; then
-    echo "Blasting consensus sequences"
+        echo "$(date +'%d/%B/%Y %R') If you are not polishing with Medaka BLAST for Racon assembled sequences should start now..." | tee -a Decona_logfile.txt ;
     (
         cd "$folder"/"multi-seq" || exit ;
         pwd
@@ -527,46 +606,26 @@ fi
           fi
         done
 
-
         if [ `ls -1 n-pol*.fasta 2>/dev/null | wc -l ` -gt 0 ]; then
             cat n-pol*.fasta > all_polished_fastas.fasta ;
-
-            if  [ -f $BLASTdir ] || [ -f $BLASTdir.fasta ] || [ -f $BLASTdir.nsi ] || [ -f $BLASTdir.nin ] || [ -f $BLASTdir.fasta.nsi ] || [ -f $BLASTdir.fasta.nin ]; then
-            blastn -query all_polished_fastas.fasta -db "$BLASTdir" -perc_identity 80 -outfmt "7 qseqid pident length mismatch gapopen evalue bitscore salltitles sallseqid" -max_target_seqs 20 -max_hsps 500 -num_threads "$MULTITHREAD" > BLAST_out_clusters.txt ;
-
-            for result in BLAST_out_clusters.txt ; do
-            cat "$result" | grep -A 4 'Query' | sed '/^--$/d' | sed '/^# BLASTN/d' | sed '/^# Database/d' | sed '/^# Fields/d' | sed '/. hits found/d' | sed -e :a -e '$!N;s/\npolished-/ /;ta' -e 'P;D' | sed -e :a -e '$!N;s/\nconsensus_medaka/ /;ta' -e 'P;D' | sed 's/# Query: //' | awk '{$2=""; print $0}' > summary_"$result"
-            sed -i 's/consensus_medaka-//' summary_"$result"
-            sed -i 's/polished-//' summary_"$result"
-            sed -i 's/-/\t/' summary_"$result"
-            sed -i 's/-/\t/' summary_"$result"
-            sed -i 's/.fasta//' summary_"$result"
-            sed -i 's/concatenated_//' summary_"$result"
-            sed -i 's/_clust//' summary_"$result"
-            sed -i '/^#  processed /d' summary_"$result"
-            sed -i '1 i\n_sequences, cluster_id, query_id, %_identity, alignment_length, mismatches, gap_opens, evalue, bit_score, subject_titles' "$result"
-            sed -i '1 i\'"$result"'' summary_"$result"
-            sed -i 's/BLAST_out_medaka_clusters_//' summary_"$result"
-            sed -i 's/.txt//' summary_"$result"
-            echo " " >> summary_"$result"
-            cat summary_"$result" | sed '/^# Fields/d' >> All_summary.txt
-            sed -i '1 i\n_sequences, cluster_id, query_id, %_identity, alignment_length, mismatches, gap_opens, evalue, bit_score, subject_titles' All_summary.txt
-            done
-            fi
-       fi
-
-
+            cp all_polished_fastas.fasta "polished_fastas_${folder}.fasta" ;
+        fi
+        
+        if [[ $MEDAKA = "no" ]] ; then
+        for blast_file in polished_fastas_${folder}.fasta ; do
+        blast_function
+        done
+        fi
     )
     fi
     done
-    echo "Blast Racon sequences finished"
 
 
 # Counting how many sequences ended up in the clusters
 for percentage in */report_*.txt ; do
 if [ -e "$percentage" ] ; then
-echo -n "${percentage%%.*}    " >> percentage_per_barcode.txt
-cat "$percentage" | grep -A 0 'total seq: ' | sed 's/total seq: //' >> percentage_per_barcode.txt
+echo -n "${percentage%%.*}    " >> percentage_per_barcode.txt || continue
+cat "$percentage" | grep -A 0 'total seq: ' | sed 's/total seq: //' >> percentage_per_barcode.txt || continue
 fi
 done
 
@@ -599,17 +658,17 @@ if [ -e "$clusters"/multi-seq ] ; then
 fi
 done
 
-paste percentage_per_barcode.txt percentage2.txt | column -s $'\t' -t > combined.txt
-rm percentage2.txt
-cat combined.txt | sed 's/demultiplexed_.*report_//' > combined2.txt
-awk '{$3=sprintf("%d\t(%.2f%)", $3, ($3/$2)*100)}1' combined2.txt > percentage_per_barcode.txt
-rm combined2.txt combined.txt
+paste percentage_per_barcode.txt percentage2.txt | column -s $'\t' -t > combined.txt || :
+#rm percentage2.txt || :
+cat combined.txt | sed 's/demultiplexed_.*report_//' > combined2.txt || :
+awk '{$3=sprintf("%d\t(%.2f%)", $3, ($3/$2)*100)}1' combined2.txt > percentage_per_barcode.txt || :
+#rm combined2.txt combined.txt || : 
 
 ######################################################################################################
 #re-clustering clusters
 if [ $RECLUSTER == "yes" ] ; then
 MEDAKA="yes"
-
+echo "$(date +'%d/%B/%Y %R') Re-clustering data and making fresh alignments & polish..." | tee -a Decona_logfile.txt ;
 for clusters in * ; do
 if [ -d "$clusters"/multi-seq ] ; then
 (
@@ -618,10 +677,10 @@ if [ -d "$clusters"/multi-seq ] ; then
     #If Medaka polished consensus sequences are made they will be used for re-clustering. If they were not made the Racon sequences are used (not reccomended).
     if [ -e all_medaka_fastas.fasta ] ;
         then
-            cd-hit-est -i all_medaka_fastas.fasta -o 2nd_clust.fasta -c 0.99 -n 5 -d 0 -M 0 -T "$MULTITHREAD" -g "$CLUSTprog" ;
+            cd-hit-est -i all_medaka_fastas.fasta -o 2nd_clust.fasta -c 0.99 -n 5 -d 0 -M 0 -T "$MULTITHREAD" -g 1 ;
         elif [ -e all_polished_fastas.fasta ] ;
         then
-            cd-hit-est -i all_polished_fastas.fasta -o 2nd_clust.fasta -c 0.99 -n 5 -d 0 -M 0 -T "$MULTITHREAD" -g "$CLUSTprog" ;
+            cd-hit-est -i all_polished_fastas.fasta -o 2nd_clust.fasta -c 0.99 -n 5 -d 0 -M 0 -T "$MULTITHREAD" -g 1 ;
         else
             echo "folder $clusters does not have multiple clusters larger then $CLUSTERSIZE"
     fi
@@ -665,7 +724,7 @@ if [ -d "$clusters"/multi-seq ] ; then
         if ! [ "$CLUSTERmax" = "no" ] ; then
             for file in *concatenated_2nd_round*.fa ;  do
                 if [ -f "$file" ] ; then
-                awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);} END {printf("\n");}' < "${file}" | awk 'NR>1{ printf("%s",$0); n++; if(n%2==0) { printf("\n");} else { printf("\t");} }' | awk -v k="$CLUSTERmax" 'BEGIN{srand(systime() + PROCINFO["pid"]);}{s=x++<k?x-1:int(rand()*x);if(s<k)R[s]=$0}END{for(i in R)print R[i]}' | awk -F"\t" '{print $1"\n"$2 > "'"subsampled_"$CLUSTERmax"-${file}"'"}'
+                awk '{print $1}' < "${file}"| awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);} END {printf("\n");}' | awk 'NR>1{ printf("%s",$0); n++; if(n%2==0) { printf("\n");} else { printf("\t");} }' | awk -v k="$CLUSTERmax" 'BEGIN{srand(systime() + PROCINFO["pid"]);}{s=x++<k?x-1:int(rand()*x);if(s<k)R[s]=$0}END{for(i in R)print R[i]}' | awk -F"\t" '{print $1"\n"$2 > "'"subsampled_"$CLUSTERmax"-${file}"'"}'                
                 mv "$file" ..
                 fi
             done
@@ -702,7 +761,7 @@ if [ -d "$clusters"/multi-seq ] ; then
             for fa in *.fa ;  do
             if [ -f polished_"$fa"sta ] ; then #######
             echo "polishing "$fa" Racon sequence with Medaka..."
-            medaka_consensus -i "$fa" -d polished_"$fa"sta -o consensus_medaka_"$fa" -t "$MULTITHREAD" ;
+            medaka_consensus -i "$fa" -d polished_"$fa"sta -o consensus_medaka_"$fa" -t "$MULTITHREAD" || echo "Medaka polishing "${fa}" failed." > failed_polishing_files.txt  ;
             fi
             done
         fi
@@ -763,13 +822,15 @@ if [ -d "$clusters"/multi-seq ] ; then
 )
 fi
 done
+echo "$(date +'%d/%B/%Y %R') Re-clustering and polishing passed" | tee -a Decona_logfile.txt ;
 
 for folder in * ; do
 if [ -e "$folder"/multi-seq ] ; then
     (
     cd "$folder" || exit ;
         if [ -e "reclusterd_fastas.fasta" ] ; then
-        mv reclusterd_fastas.fasta "reclusterd_fastas_${folder}.fasta" ; fi
+        mv reclusterd_fastas.fasta "reclusterd_fastas_${folder}.fasta" ; 
+        fi
 
     )
 fi
@@ -778,26 +839,11 @@ done
 for clusters in * ; do
 if [ -e "$clusters"/multi-seq ] ; then
 (
+    echo "$(date +'%d/%B/%Y %R') Blasting re-clustered sequences "$clusters"..." | tee -a Decona_logfile.txt ;
     cd "$clusters" || exit
-    if [ -e reclusterd_fastas*.fasta ] && [ -f $BLASTdir ] ; then
-    for blast in reclusterd_fastas*.fasta ; do
-        blastn -query "$blast" -db "$BLASTdir" -perc_identity 80 -outfmt "7 qseqid pident length mismatch gapopen evalue bitscore salltitles sallseqid" -max_target_seqs 20 -max_hsps 500 -num_threads "$MULTITHREAD" > BLAST_out_reclustered_"${clusters}".txt ;
-        for result in BLAST_out_re*.txt ; do
-        cat "$result" | grep -A 4 'Query' | sed '/^--$/d' | sed '/^# BLASTN/d' | sed '/^# Database/d' | sed '/^# Fields/d' | sed '/. hits found/d' | sed -e :a -e '$!N;s/\npolished-/ /;ta' -e 'P;D' | sed -e :a -e '$!N;s/\nconsensus_medaka/ /;ta' -e 'P;D' | sed 's/# Query: //' | awk '{$2=""; print $0}' > "$result"_summary1.txt
-        sed -i 's/consensus_medaka-//' "$result"_summary1.txt
-        sed -i 's/polished-//' "$result"_summary1.txt
-        sed -i 's/-/\t/' "$result"_summary1.txt
-        sed -i 's/-/\t/' "$result"_summary1.txt
-        sed -i 's/.fasta//' "$result"_summary1.txt
-        sed -i 's/concatenated_//' "$result"_summary1.txt
-        sed -i 's/_clust//' "$result"_summary1.txt
-        sed -i '/^#  processed /d' "$result"_summary1.txt
-        sed -i '1 i\n_sequences, cluster_id, query_id, %_identity, alignment_length, mismatches, gap_opens, evalue, bit_score, subject_titles' "$result"_summary1.txt
-        sed -i '1 i\'"$result"'' "$result"_summary1.txt
-        sed -i 's/BLAST_out_medaka_clusters_//' "$result"_summary1.txt
-        sed -i 's/.txt//' "$result"_summary1.txt
-        echo " " >> "$result"_summary1.txt
-        done
+    if [ -e reclusterd_fastas*.fasta ] ; then
+    for blast_file in reclusterd_fastas*.fasta ; do
+    blast_function || echo "blast error"
     done
     fi
 
@@ -892,9 +938,7 @@ fi
 fi
 
 #########################################################################################################
-echo " "
-echo "The script is now rearanging some files. You will find all your blast results, consensus sequences and variant data in the results folder!"
-echo " "
+echo "$(date +'%d/%B/%Y %R') Making results folder..." | tee -a Decona_logfile.txt ;
 mkdir result
 mkdir result/Racon
 if [ $MEDAKA == "yes" ] ; then
@@ -911,33 +955,32 @@ for folder in * ; do
 if [ -e "$folder"/multi-seq ] ; then
     (
     cd "$folder" || echo "could not find $folder" ;
-        #Reclusterd data
-        if [ -e "BLAST_out_reclustered_$folder.txt_summary1.txt" ] ; then
-        cat BLAST_out_reclustered_$folder.txt_summary1.txt | sed '/^# Fields/d' >> All_reclustered_summary_$folder.txt
-        sed -i '1 i\n_sequences, cluster_id, query_id, %_identity, alignment_length, mismatches, gap_opens, evalue, bit_score, subject_titles' All_reclustered_summary_$folder.txt
-        rm BLAST_out_reclustered*summary1.txt ;
-        mv All_reclustered_summary_$folder.txt ../result/reclustered/"summary_BLAST_reclustered_$folder.txt" ; fi
-        if [ -e "BLAST_out_reclustered_$folder.txt" ] ; then
-        mv BLAST_out_reclustered_$folder.txt ../result/reclustered/"BLAST_out_reclustered_$folder.txt" ; fi
+        #Reclustered
         if [ -e "reclusterd_fastas_$folder.fasta" ] ; then
         mv reclusterd_fastas_$folder.fasta ../result/reclustered/"all_reclusterd_fastas_$folder.fasta" ; fi
+        if [ -e finalblastoutput.txt ] && [ $RECLUSTER = "yes" ] ; then
+        mv finalblastoutput.txt ../result/reclustered/"finalblastoutput_$folder.txt" ;
+        cat ../result/reclustered/finalblastoutput_*.txt >> ../result/reclustered/All_finalblastoutput.txt ;
+        cat All_summary.txt >> ../result/reclustered/BLAST_summary.txt ; fi
+        #Medaka
+        if [ -e /finalblastoutput.txt ] && [ $RECLUSTER = "no" ] && [ $MEDAKA == "yes" ] ; then
+        mv finalblastoutput.txt ../result/Medaka/"finalblastoutput_$folder.txt" ;
+        cat ../result/Medaka/finalblastoutput_*.txt >> ../result/Medaka/All_finalblastoutput.txt ; 
+        cat All_summary.txt >> ../result/Medaka/BLAST_summary.txt ; fi
+        #Racon
+        if [ -e /finalblastoutput.txt ] && [ $MEDAKA = "no" ] ; then
+        mv finalblastoutput.txt ../result/Racon/"finalblastoutput_$folder.txt"
+        cat ../result/Racon/finalblastoutput_*.txt >> ../result/Racon/All_finalblastoutput.txt ; 
+        cat All_summary.txt >> ../result/Racon/BLAST_summary.txt ; fi
 
     cd multi-seq || echo "could not find "$folder"/multi-seq" ;
-        #Racon
         if [ -e "all_polished_fastas.fasta" ] ; then
         mv all_polished_fastas.fasta ../../result/Racon/"all_racon_fastas_${folder}.fasta" ; fi
-        if [ -e "BLAST_out_clusters.txt" ] ; then
-        mv BLAST_out_clusters.txt ../../result/Racon/"BLAST_out_racon_clusters_${folder}.txt" ; fi
-        if [ -e "summary_BLAST_out_clusters.txt" ] ; then
-        mv summary_BLAST_out_clusters.txt ../../result/Racon/"summary_BLAST_out_racon_clusters_${folder}.txt" ; fi
-        #Medaka
-        if [ -e "BLAST_out_medaka_clusters.txt" ] ; then
-        mv BLAST_out_medaka_clusters.txt ../../result/Medaka/"BLAST_out_medaka_clusters_${folder}.txt" ; fi
         if [ -e "all_medaka_fastas.fasta" ] ; then
         mv all_medaka_fastas.fasta ../../result/Medaka/"all_medaka_fastas_${folder}.fasta" ; fi
-        if [ -e "summary_BLAST_out_Medaka_clusters.txt" ] ; then
-        mv summary_BLAST_out_Medaka_clusters.txt ../../result/Medaka/"summary_BLAST_Medaka_${folder}.txt" ; fi
     )
+    
+    
 fi
 done
 
@@ -1006,6 +1049,45 @@ if [ -d "$folder" ] ; then
 fi
 done
 
+for folder in result/*/ ; do
+if [ -f "$folder"All_finalblastoutput.txt ] ; then
+    if [ -f data/Decona_logfile.txt ] ; then
+        echo "$(date +'%d/%B/%Y %R') Running OTU clustering step and Rscript..." | tee -a data/Decona_logfile.txt ; 
+    else
+        echo "$(date +'%d/%B/%Y %R') Running OTU clustering step and Rscript..." | tee -a Decona_logfile.txt ;
+    fi
+
+(
+    cd "$folder" || echo "could not find final blast output" ;
+    cd-hit-est -i All_barcodes_combined.fasta -o OTUclusters.txt -c "$OTUcall" -n 5 -d 75 -M 0 -T 4 -g 1 
+
+    # The .clstr file is split into files containing the names of all sequences beloning to the cluster/OTU.
+    if [ -f OTUclusters.txt ] ; then   
+        csplit OTUclusters.txt.clstr '/^>Cluster/' '{*}' --elide-empty-files -f OTU_ -b "%03d.txt"
+        for file in OTU_* ; do
+        cat "$file" | awk '{print$3}' | sed '/^$/d' | sed 's/...$//' | sed 's/_concatenated//' | sed 's/_medaka-/.*/' | sed 's/>//' > ${file%%.*}
+        rm "$file"
+        done
+    fi
+
+    for file in OTU_* ; do
+        grep -f "$file" All_finalblastoutput.txt | sed '/^--$/d' | sed 's/$/\t'"$file"'/g' >> OTUcalled_finalblastoutput.txt
+        rm "$file"
+    done
+
+    rm OTUclusters.txt || continue
+    rm OTUclusters.txt.clstr || continue
+
+)
+fi
+done
+
+
+### Write Decona logfile ###
 end=$SECONDS
 duration=$(( end - start ))
-echo "Decona took $duration seconds to complete the job"
+if [ -f data/Decona_logfile.txt ] ; then
+    echo "$(date +'%d/%B/%Y %R') Decona total runtime: $duration" | tee -a data/Decona_logfile.txt ; 
+else
+    echo "$(date +'%d/%B/%Y %R') Decona total runtime: $duration" | tee -a Decona_logfile.txt ;
+fi
