@@ -91,61 +91,21 @@ fi
 # Get the location of this script's path to determine where we find the environment definition and the decona executable.
 script_path=$(dirname "$(realpath "$0")")
 
-# Check whether Decona is a git repository. If it is not, we clone CD-HIT separately, otherwise we use the submodule.
-if [ -d "$script_path/../.git" ]; then
-    if [ -z "$(find "$script_path/../external" -empty)" ]; then
-        echo "Found CD-HIT..."
-    else
-        check_git
-        echo "Cloning CD-HIT submodule..."
-        cd "$script_path/.." && git submodule update --init --recursive > /dev/null
-        if [ $? -ne 0 ]; then
-            echo "Failed to clone CD-HIT submodule"
-            exit 5
-        fi
-    fi
-else
-    check_git
-    echo "Cloning CD-HIT..."
-    # Note: we check out V4.8.1; this should be changed when the submodule is updated to a new version.
-    cd "$script_path/../external" && git clone --recurse-submodules -b V4.8.1 https://github.com/weizhongli/cdhit.git &> /dev/null
-    if [ $? -ne 0 ]; then
-        echo "Failed to clone CD-HIT"
-        exit 5
-    fi
-fi
-
-# Build CD-HIT before trying to make the environment, we want to see any errors from this build before starting the
-# lengthy process of generating an Anaconda environment.
-echo "Building CD-HIT..."
-cd_hit_path="$script_path/../external/cdhit"
-check_cdhit_dependencies
-cd "$cd_hit_path" && make > /dev/null
-if [ $? -ne 0 ]; then
-    echo "Failed to build CD-HIT"
-    exit 5
-fi
-
-echo "Creating Python environment and installing packages, this might take a long time..."
+echo "Creating Conda environment and installing packages, this might take some time..."
 env_file="$script_path/decona.yml"
 if [ -z "$prefix" ]; then
     # Use conda's default environment location.
-    conda env create -f "$env_file" --name "$name" > /dev/null
+    conda create medaka=1.11.3 python=3.8.10 cutadapt=4.8 racon=1.4.20 NanoFilt=2.8.0 cd-hit=4.8.1 blast=2.15.0 --channel conda-forge --channel bioconda --name "$name" > /dev/null
     # Get the path of the newly created environment.
     prefix=$(conda env list | grep -Po "(?<=$name).*$" | tr -d ' ')
     activation_name="$name"
 else
     # Create environment in the specified location.
-    conda env create --prefix "$prefix" -f "$env_file" > /dev/null
+    conda create --prefix "$prefix" medaka=1.11.3 python=3.8.10 cutadapt=4.8 racon=1.4.20 NanoFilt=2.8.0 cd-hit=4.8.1 blast=2.15.0 --channel conda-forge --channel bioconda > /dev/null
     activation_name="$prefix"
 fi
 
-echo "Integrating CD-HIT and Decona with the Python environment..."
+echo "Integrating Decona with the Python environment..."
 ln -s "$script_path/../decona" "$prefix/bin/decona"
-
-# The following CD-HIT executables are used in Decona.
-ln -s "$script_path/../external/cdhit/cd-hit-est" "$prefix/bin"
-ln -s "$script_path/../external/cdhit/plot_len1.pl" "$prefix/bin"
-ln -s "$script_path/../external/cdhit/make_multi_seq.pl" "$prefix/bin"
 
 echo "Installed Decona and created a new Python environment; use 'conda activate $activation_name' to activate it, then run 'decona'."
