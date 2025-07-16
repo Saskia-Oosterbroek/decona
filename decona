@@ -661,7 +661,7 @@ done
 paste percentage_per_barcode.txt percentage2.txt | column -s $'\t' -t > combined.txt || :
 #rm percentage2.txt || :
 cat combined.txt | sed 's/demultiplexed_.*report_//' > combined2.txt || :
-awk '{$3=sprintf("%d\t(%.2f%)", $3, ($3/$2)*100)}1' combined2.txt > percentage_per_barcode.txt || :
+awk '{$3=sprintf("%d\t(%.2f%%)", $3, ($3/$2)*100)}1' combined2.txt > percentage_per_barcode.txt || :
 #rm combined2.txt combined.txt || : 
 
 ######################################################################################################
