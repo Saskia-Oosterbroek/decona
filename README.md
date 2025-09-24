@@ -1,11 +1,12 @@
 
-## New paper (including Decona) available as preprint on Biorxiv
+Find Decona in our paper:
+### The Long and the Short of It: Nanopore-Based eDNA Metabarcoding of Marine Vertebrates Works; Sensitivity and Species-Level Assignment Depend on Amplicon Lengths 
 
-### **High resolution species detection: accurate long read eDNA metabarcoding of North Sea fish using Oxford Nanopore sequencing**
 
-Karlijn Doorenspleet, Lara Jansen, Saskia Oosterbroek, Oscar Bos, Pauline Kamermans, Max Janse, Erik Wurz, Albertinka Murk, Reindert Nijland
+Karlijn Doorenspleet, Lara Jansen, Saskia Oosterbroek, Pauline Kamermans, Oscar Bos, Erik Wurz, Albertinka Murk, Reindert Nijland
 
-doi: https://doi.org/10.1101/2021.11.26.470087
+
+Find the paper here: DOI <a href="http://doi.org/10.1111/1755-0998.14079">10.1111/1755-0998.14079</a> 
 
 # Decona [![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/SaskiaO13.svg?style=social&label=Follow%20%40SaskiaO13)](https://twitter.com/SaskiaO13)
 
@@ -114,6 +115,14 @@ Will: Demultiplex, filter for read length 800-2100 bp and quality score 10, clus
 
 ## Warning
 **Selecting the right stringency for the clustering setting is very important.** If it is set too low, species will be clustered together; if it is set too high, species will be lost as more singletons emerge. R9 and R10 data absolutely require different stringencies. Genetic markers with more or less genetic variation will also need to be clustered with higher or lower stringency. **It is advisable to conduct several small runs to determine the appropriate level of stringency for your amplicon.**
+
+<img src="https://github.com/Saskia-Oosterbroek/decona/blob/master/cluster_settings.jpg" width="400" />
+Comparison of DECONA cluster settings for two mitochondrial amplicons. The MiFish amplicon a ~ 170 bp fragment of the 12S rRNA gene and the 2Kb long amplicon partly covering 2Kb of the 12S & 16S rRNA gene.
+The figure shows the number of unique species, clusters and the number of reads remaining when setting a certain minimal q‐score (Q 8 - 20) in combination with different minimal % identity thresholds for clusters (80 – 100%).  (A & B) Number of unique species, (C & D) number of unique clusters (E & F) the amount of reads that remain with each combination of minimal q‐score and clustering percentage.
+
+*(This is figure 3 from our paper "The Long and the Short of It: Nanopore-Based eDNA Metabarcoding of Marine Vertebrates Works; Sensitivity and Species-Level Assignment Depend on Amplicon Lengths"
+ DOI <a href="http://doi.org/10.1111/1755-0998.14079">10.1111/1755-0998.14079</a> )*
+
 
 ## Running Decona on the example data
 
